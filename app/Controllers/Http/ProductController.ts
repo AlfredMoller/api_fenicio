@@ -40,6 +40,8 @@ export default class ProductController {
         }),
       })
 
+      // Se arma estructura de query similar a stringbuilder 
+
       try {
         const productos = await Database
           .connection('sybase')
