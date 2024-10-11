@@ -1,0 +1,35 @@
+# Usa una imagen base con Node.js 14 para compilar
+FROM node:14 as build
+
+# Crea y establece el directorio de trabajo
+WORKDIR /app
+
+# Copia los archivos necesarios para compilar (por ejemplo, package.json y package-lock.json)
+COPY package*.json ./
+
+# Instala las dependencias de Node.js
+RUN npm install
+
+# Copia el resto de la aplicación
+COPY . .
+
+# Compila la aplicación (ajústalo según tus necesidades)
+# RUN npm run build
+
+# --------------------------------
+
+# Cambia a una imagen base con Node.js 20.11.0
+FROM node:20.11.0
+
+# Instala Java
+RUN apt-get update \
+    && apt-get install -y default-jre
+
+# Crea y establece el directorio de trabajo
+WORKDIR /app
+
+# Copia solo los archivos necesarios para ejecutar la aplicación (incluyendo los archivos compilados)
+COPY --from=build /app .
+
+# Comando para iniciar la aplicación (ajústalo según tus necesidades)
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,1 @@
+docker build -t integracion:latest -f Dockerfile.prod .

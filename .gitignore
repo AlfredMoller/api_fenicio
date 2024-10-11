@@ -1,0 +1,14 @@
+coverage
+.vscode
+.DS_STORE
+.env
+tmp 
+node_modules  
+database/*.sqlite
+# Logs
+logs
+*.log 
+ 
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build
+ 
