@@ -40,6 +40,17 @@ export default class ProductController {
         }),
       })
 
+     // Validar que 'desde' y 'total' no sean 0
+    if (parametros.desde <= 0 || parametros.total <= 0) {
+      return response.status(400).send({
+        status: 'ERROR',
+        mensaje: "Los parámetros 'desde' y 'total' deben ser mayores a 0",
+        code: 400,
+        _idSolicitud: parametros._idSolicitud,
+        data: null,
+      });
+    }
+
       // Se arma estructura de query similar a stringbuilder 
 
       try {
