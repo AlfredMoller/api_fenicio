@@ -57,7 +57,7 @@ export default class ProductController {
       // Se arma estructura de query similar a stringbuilder 
 
       try {
-        /*const productos = await Database
+        const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
           .select(
@@ -103,9 +103,9 @@ export default class ProductController {
             Database.raw(
               '  [codigo] asc ) as xd  WHERE xd.existencia is not NULL '
             ))
-          .timeout(1000)*/
+          .timeout(1000)
 
-          const productos = await Database
+          /*const productos = await Database
           .connection('sybase')
           .from(
             Database.raw(
@@ -131,7 +131,7 @@ export default class ProductController {
                 ORDER BY DBA.ARTICULO.cod_articulo ASC)`
             )
           )
-          .timeout(1000);
+          .timeout(1000);*/
 
         // Los campos precio_lista y precio_venta tendrían que llegar como "precioLista" y "precioVenta".
         let newProduct: any[] = []
