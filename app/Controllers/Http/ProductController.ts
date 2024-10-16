@@ -57,7 +57,7 @@ export default class ProductController {
       // Se arma estructura de query similar a stringbuilder 
 
       try {
-        const productos = await Database
+        /*const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
           .select(
@@ -103,35 +103,39 @@ export default class ProductController {
             Database.raw(
               '  [codigo] asc ) as xd  WHERE xd.existencia is not NULL '
             ))
-          .timeout(1000)
-
-          /*const productos = await Database
+          .timeout(1000)*/
+          const productos = await Database
           .connection('sybase')
-          .from(
+          .from('DBA.ARTICULO')
+          .select(
+            'DBA.ARTICULO.cod_articulo AS codigo',
+            'DBA.ARTICULO.des_art AS nombre',
+            'DBA.ARTICULO.cod_grupo',
+            'DBA.ARTICULO.cod_familia',
+            'DBA.FAMILIA.des_familia',
+            'DBA.ARTICULO.cod_original',
+            'DBA.ARTICULO.pr4_gs',
+            'DBA.ARTICULO.pr4_me',
+            'DBA.ARTICULO.CodMoneda'
+          )
+          .select(
             Database.raw(
-              `(SELECT TOP ${parametros.total} 
-                  DBA.ARTICULO.cod_articulo AS codigo,
-                  DBA.ARTICULO.des_art AS nombre,
-                  DBA.ARTICULO.cod_grupo,
-                  DBA.ARTICULO.cod_familia,
-                  DBA.FAMILIA.des_familia,
-                  DBA.ARTICULO.cod_original,
-                  DBA.ARTICULO.pr4_gs,
-                  DBA.ARTICULO.pr4_me,
-                  DBA.ARTICULO.CodMoneda,
-                  (SELECT SUM(existencia)
-                  FROM DBA.ARTDEP ar
-                  WHERE ar.cod_empresa = '${COD_EMPRESA}'
-                    AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
-                    AND ar.existencia > 0) AS existencia
-                FROM DBA.ARTICULO
-                JOIN DBA.FAMILIA ON DBA.ARTICULO.cod_familia = DBA.FAMILIA.cod_familia
-                WHERE DBA.ARTICULO.cod_empresa = '${COD_EMPRESA}'
-                  AND DBA.FAMILIA.COD_FAMILIA NOT IN ('GA', '011')
-                ORDER BY DBA.ARTICULO.cod_articulo ASC)`
+              `(SELECT SUM(existencia)
+               FROM DBA.ARTDEP ar
+               WHERE ar.cod_empresa = '${COD_EMPRESA}'
+                 AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
+                 AND ar.existencia > 0) AS existencia`
             )
           )
-          .timeout(1000);*/
+          .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
+          .where('DBA.ARTICULO.cod_empresa', COD_EMPRESA)
+          .whereRaw('DBA.FAMILIA.COD_FAMILIA not in (?, ?)', ['GA', '011'])
+          .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
+          .limit(parametros.total)
+          .offset(parametros.desde)
+          .timeout(1000);
+        
+         
 
         // Los campos precio_lista y precio_venta tendrían que llegar como "precioLista" y "precioVenta".
         let newProduct: any[] = []
