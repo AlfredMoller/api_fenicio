@@ -122,17 +122,23 @@ export default class ProductController {
               `(SELECT SUM(existencia)
               FROM DBA.ARTDEP ar
               WHERE ar.cod_empresa = '${COD_EMPRESA}'
-              AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
-              AND ar.existencia > 0) AS existencia`
+                AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
+                AND ar.existencia > 0) AS existencia`
             )
           )
           .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
           .where('DBA.ARTICULO.cod_empresa', COD_EMPRESA)
           .whereRaw('DBA.FAMILIA.COD_FAMILIA NOT IN (?, ?)', ['GA', '011'])
+          .whereExists(function () {
+            this.select(1)
+              .from('DBA.ARTDEP')
+              .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
+              .andWhere('DBA.ARTDEP.existencia', '>', 0)
+          })
           .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
           .limit(parametros.total)
-          .offset(parametros.desde)
           .timeout(1000);
+
 
         
          
