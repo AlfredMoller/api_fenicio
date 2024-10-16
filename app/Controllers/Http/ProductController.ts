@@ -109,10 +109,7 @@ export default class ProductController {
           .connection('sybase')
           .from(
             Database.raw(
-              `(SELECT *
-              FROM (
-                SELECT 
-                  ROW_NUMBER() OVER (ORDER BY DBA.ARTICULO.cod_articulo ASC) AS RowNum,
+              `(SELECT TOP ${parametros.total} 
                   DBA.ARTICULO.cod_articulo AS codigo,
                   DBA.ARTICULO.des_art AS nombre,
                   DBA.ARTICULO.cod_grupo,
@@ -131,8 +128,7 @@ export default class ProductController {
                 JOIN DBA.FAMILIA ON DBA.ARTICULO.cod_familia = DBA.FAMILIA.cod_familia
                 WHERE DBA.ARTICULO.cod_empresa = '${COD_EMPRESA}'
                   AND DBA.FAMILIA.COD_FAMILIA NOT IN ('GA', '011')
-              ) AS productos
-              WHERE RowNum BETWEEN ${parametros.desde} AND (${parametros.desde} + ${parametros.total} - 1))`
+                ORDER BY DBA.ARTICULO.cod_articulo ASC)`
             )
           )
           .timeout(1000);
