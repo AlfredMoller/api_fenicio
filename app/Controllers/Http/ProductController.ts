@@ -57,7 +57,7 @@ export default class ProductController {
       // Se arma estructura de query similar a stringbuilder 
 
       try {
-        const productos = await Database
+        /*const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
           .select(
@@ -103,7 +103,41 @@ export default class ProductController {
             Database.raw(
               '  [codigo] asc ) as xd  WHERE xd.existencia is not NULL '
             ))
-          .timeout(1000)
+          .timeout(1000)*/
+
+          const productos = await Database
+          .connection('sybase')
+          .from(
+            Database.raw(
+              `(SELECT *
+              FROM (
+                SELECT 
+                  ROW_NUMBER() OVER (ORDER BY DBA.ARTICULO.cod_articulo ASC) AS RowNum,
+                  DBA.ARTICULO.cod_articulo AS codigo,
+                  DBA.ARTICULO.des_art AS nombre,
+                  DBA.ARTICULO.cod_grupo,
+                  DBA.ARTICULO.cod_familia,
+                  DBA.FAMILIA.des_familia,
+                  DBA.ARTICULO.cod_original,
+                  DBA.ARTICULO.pr4_gs,
+                  DBA.ARTICULO.pr4_me,
+                  DBA.ARTICULO.CodMoneda,
+                  (SELECT SUM(existencia)
+                   FROM DBA.ARTDEP ar
+                   WHERE ar.cod_empresa = '${COD_EMPRESA}'
+                     AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
+                     AND ar.existencia > 0) AS existencia
+                FROM DBA.ARTICULO
+                JOIN DBA.FAMILIA ON DBA.ARTICULO.cod_familia = DBA.FAMILIA.cod_familia
+                WHERE DBA.ARTICULO.cod_empresa = '${COD_EMPRESA}'
+                  AND DBA.FAMILIA.COD_FAMILIA NOT IN ('GA', '011')
+              ) AS productos
+              WHERE RowNum BETWEEN ${parametros.desde} AND (${parametros.desde} + ${parametros.total} - 1))
+              ORDER BY RowNum`
+            )
+          )
+          .timeout(1000);
+
         // Los campos precio_lista y precio_venta tendrían que llegar como "precioLista" y "precioVenta".
         let newProduct: any[] = []
         productos.forEach((d) => {
