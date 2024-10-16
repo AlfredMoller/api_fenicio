@@ -104,36 +104,43 @@ export default class ProductController {
               '  [codigo] asc ) as xd  WHERE xd.existencia is not NULL '
             ))
           .timeout(1000)*/
+        
           const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
           .select(
-            'DBA.ARTICULO.cod_articulo AS codigo',
-            'DBA.ARTICULO.des_art AS nombre',
-            'DBA.ARTICULO.cod_grupo',
-            'DBA.ARTICULO.cod_familia',
-            'DBA.FAMILIA.des_familia',
-            'DBA.ARTICULO.cod_original',
-            'DBA.ARTICULO.pr4_gs',
-            'DBA.ARTICULO.pr4_me',
-            'DBA.ARTICULO.CodMoneda'
-          )
-          .select(
             Database.raw(
-              `(SELECT SUM(existencia)
-               FROM DBA.ARTDEP ar
-               WHERE ar.cod_empresa = '${COD_EMPRESA}'
-                 AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
-                 AND ar.existencia > 0) AS existencia`
+              ` * FROM ( SELECT TOP ${parametros.total} [DBA].[ARTICULO].[cod_articulo] as codigo `
             )
           )
+          .select('DBA.ARTICULO.des_art as nombre')
+          .select('DBA.ARTICULO.cod_grupo')
+          .select('DBA.ARTICULO.cod_familia')
+          .select('DBA.FAMILIA.des_familia')
+          .select('DBA.ARTICULO.cod_original')
+          .select('DBA.ARTICULO.pr4_gs')
+          .select('DBA.ARTICULO.pr4_me')
+          .select('DBA.ARTICULO.CodMoneda')
+          .select(
+              Database.raw(
+                ` (  Select  Sum(existencia)
+                from [DBA].ARTDEP ar
+                where ar.cod_empresa =  '${COD_EMPRESA}'
+                and	ar.cod_articulo = [DBA].[ARTICULO].[cod_articulo]
+                AND ar.existencia > 0 ) as existencia `
+              )
+            )
           .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
-          .where('DBA.ARTICULO.cod_empresa', COD_EMPRESA)
-          .whereRaw('DBA.FAMILIA.COD_FAMILIA not in (?, ?)', ['GA', '011'])
-          .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
-          .limit(parametros.total)
-          .offset(parametros.desde)
-          .timeout(1000);
+          .where('DBA.ARTICULO.cod_empresa', `${COD_EMPRESA}`,)
+          .whereRaw('DBA.FAMILIA.COD_FAMILIA not in (?,?)', ['GA', '011'])
+          // .limit(parametros.total)
+          // .offset(parametros.desde)
+          // .orderBy('codigo')
+          .orderByRaw(
+            Database.raw(
+              '  [codigo] asc ) '
+            ))
+          .timeout(1000)
         
          
 
