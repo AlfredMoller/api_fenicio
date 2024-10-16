@@ -129,12 +129,11 @@ export default class ProductController {
           .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
           .where('DBA.ARTICULO.cod_empresa', COD_EMPRESA)
           .whereRaw('DBA.FAMILIA.COD_FAMILIA NOT IN (?, ?)', ['GA', '011'])
-          .whereExists(function () {
-            this
-              .from('DBA.ARTDEP')
-              .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
-              .where('DBA.ARTDEP.existencia', '>', 0);
-          })
+          .whereExists(Database
+            .from('DBA.ARTDEP')
+            .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
+            .where('DBA.ARTDEP.existencia', '>', 0)
+          )
 
           /*.whereExists(function () {
             this.select(1)
