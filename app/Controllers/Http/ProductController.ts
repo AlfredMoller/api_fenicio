@@ -123,17 +123,16 @@ export default class ProductController {
                   DBA.ARTICULO.pr4_me,
                   DBA.ARTICULO.CodMoneda,
                   (SELECT SUM(existencia)
-                   FROM DBA.ARTDEP ar
-                   WHERE ar.cod_empresa = '${COD_EMPRESA}'
-                     AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
-                     AND ar.existencia > 0) AS existencia
+                  FROM DBA.ARTDEP ar
+                  WHERE ar.cod_empresa = '${COD_EMPRESA}'
+                    AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
+                    AND ar.existencia > 0) AS existencia
                 FROM DBA.ARTICULO
                 JOIN DBA.FAMILIA ON DBA.ARTICULO.cod_familia = DBA.FAMILIA.cod_familia
                 WHERE DBA.ARTICULO.cod_empresa = '${COD_EMPRESA}'
                   AND DBA.FAMILIA.COD_FAMILIA NOT IN ('GA', '011')
               ) AS productos
-              WHERE RowNum BETWEEN ${parametros.desde} AND (${parametros.desde} + ${parametros.total} - 1))
-              ORDER BY RowNum`
+              WHERE RowNum BETWEEN ${parametros.desde} AND (${parametros.desde} + ${parametros.total} - 1))`
             )
           )
           .timeout(1000);
