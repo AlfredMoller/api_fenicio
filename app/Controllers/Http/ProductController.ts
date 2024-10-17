@@ -179,8 +179,8 @@ export default class ProductController {
         .orderBy('codigo')
         .timeout(1000);*/
 
-        const desde = parametros.desde === 0 ? 1 : parametros.desde; 
-        const hasta = desde + parametros.total - 1;
+        const desde = parametros.desde;  // Índice desde donde empezar
+        const total = parametros.total;  // Cantidad total de registros que necesitas
 
         const productos = await Database
           .connection('sybase')
@@ -222,11 +222,13 @@ export default class ProductController {
           .select('T.pr4_me')
           .select('T.CodMoneda')
           .select('T.existencia')
-          .whereBetween('T.row_num', [desde, hasta])
+          // Aquí traemos solo los registros desde 'desde' hasta 'desde + total - 1'
+          .whereBetween('T.row_num', [desde, desde + total - 1])
           .orderBy('T.codigo', 'asc')
           .timeout(1000);
 
-                
+
+              
          
 
         // Los campos precio_lista y precio_venta tendrían que llegar como "precioLista" y "precioVenta".
