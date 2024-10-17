@@ -57,7 +57,7 @@ export default class ProductController {
       // Se arma estructura de query similar a stringbuilder 
 
       try {
-        // QUERY MODIFICADO EL 10/10 23:00 
+        // QUERY MODIFICADO EL 10/10 23:00 - IVÁN CESPEDES
 
         /*const productos = await Database
           .connection('sybase')
@@ -107,47 +107,49 @@ export default class ProductController {
             ))
           .timeout(1000)*/
         
-          // QUERY MODIFICADO EL 16/10 17:56
-          const desde = parametros.desde === 0 ? 1 : parametros.desde; 
-          const productos = await Database
-          .connection('sybase')
-          .from('DBA.ARTICULO')
-          /*.select(
-            Database.raw(`TOP ${parametros.total} DBA.ARTICULO.cod_articulo AS codigo`)
-          )*/
-          .select('DBA.ARTICULO.cod_articulo AS codigo')
-          .select('DBA.ARTICULO.des_art AS nombre')
-          .select('DBA.ARTICULO.cod_grupo')
-          .select('DBA.ARTICULO.cod_familia')
-          .select('DBA.FAMILIA.des_familia')
-          .select('DBA.ARTICULO.cod_original')
-          .select('DBA.ARTICULO.pr4_gs')
-          .select('DBA.ARTICULO.pr4_me')
-          .select('DBA.ARTICULO.CodMoneda')
-          .select(
-            Database.raw(
-              `(SELECT SUM(existencia)
-              FROM DBA.ARTDEP ar
-              WHERE ar.cod_empresa = '${COD_EMPRESA}'
-                AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
-                AND ar.existencia > 0) AS existencia`
-            )
-          )
-          .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
-          .where('DBA.ARTICULO.cod_empresa', COD_EMPRESA)
-          .whereRaw('DBA.FAMILIA.COD_FAMILIA NOT IN (?, ?)', ['GA', '011'])
-          .whereExists(Database
-            .from('DBA.ARTDEP')
-            .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
-            .where('DBA.ARTDEP.existencia', '>', 0)
-          )
-          
-          .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
-          .offset(desde - 1) // Ajustamos el "desde"
-          .limit(parametros.total)
-          .timeout(1000);
 
-        // QUERY CREADO EL 17/10 10>14  
+          // QUERY MODIFICADO EL 16/10 17:56  - ALFRED MöLLER 
+        const desde = parametros.desde === 0 ? 1 : parametros.desde; 
+        const productos = await Database
+        .connection('sybase')
+        .from('DBA.ARTICULO')
+        /*.select(
+          Database.raw(`TOP ${parametros.total} DBA.ARTICULO.cod_articulo AS codigo`)
+        )*/
+        .select('DBA.ARTICULO.cod_articulo AS codigo')
+        .select('DBA.ARTICULO.des_art AS nombre')
+        .select('DBA.ARTICULO.cod_grupo')
+        .select('DBA.ARTICULO.cod_familia')
+        .select('DBA.FAMILIA.des_familia')
+        .select('DBA.ARTICULO.cod_original')
+        .select('DBA.ARTICULO.pr4_gs')
+        .select('DBA.ARTICULO.pr4_me')
+        .select('DBA.ARTICULO.CodMoneda')
+        .select(
+          Database.raw(
+            `(SELECT SUM(existencia)
+            FROM DBA.ARTDEP ar
+            WHERE ar.cod_empresa = '${COD_EMPRESA}'
+              AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
+              AND ar.existencia > 0) AS existencia`
+          )
+        )
+        .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
+        .where('DBA.ARTICULO.cod_empresa', COD_EMPRESA)
+        .whereRaw('DBA.FAMILIA.COD_FAMILIA NOT IN (?, ?)', ['GA', '011'])
+        .whereExists(Database
+          .from('DBA.ARTDEP')
+          .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
+          .where('DBA.ARTDEP.existencia', '>', 0)
+        )
+        
+        .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
+        .offset(desde - 1) // Ajustamos el "desde"
+        .limit(parametros.total)
+        .timeout(1000);
+
+
+        // QUERY CREADO EL 17/10 10:14 - ALFRED MöLLER   
         /*const productos = await Database
         .connection('sybase')
         .from('DBA.ARTICULO')
