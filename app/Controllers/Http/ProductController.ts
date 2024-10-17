@@ -57,6 +57,8 @@ export default class ProductController {
       // Se arma estructura de query similar a stringbuilder 
 
       try {
+        // QUERY MODIFICADO EL 10/10 23:00 
+
         /*const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
@@ -87,10 +89,10 @@ export default class ProductController {
           .select(
               Database.raw(
                 ` (  Select  Sum(existencia)
-   from [DBA].ARTDEP ar
-   where ar.cod_empresa =  '${COD_EMPRESA}'
-   and	ar.cod_articulo = [DBA].[ARTICULO].[cod_articulo]
-   AND ar.existencia > 0 ) as existencia `
+                from [DBA].ARTDEP ar
+                where ar.cod_empresa =  '${COD_EMPRESA}'
+                and	ar.cod_articulo = [DBA].[ARTICULO].[cod_articulo]
+                AND ar.existencia > 0 ) as existencia `
               )
             )
           .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
@@ -105,6 +107,7 @@ export default class ProductController {
             ))
           .timeout(1000)*/
         
+          // QUERY MODIFICADO EL 16/10 17:56
           const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
@@ -134,19 +137,43 @@ export default class ProductController {
             .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
             .where('DBA.ARTDEP.existencia', '>', 0)
           )
-
-          /*.whereExists(function () {
-            this.select(1)
-              .from('DBA.ARTDEP')
-              .whereRaw('DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo')
-              .*/
-
           
           .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
           .limit(parametros.total)
           .timeout(1000);
 
-
+        // QUERY CREADO EL 17/10 10>14  
+        /*const productos = await Database
+        .connection('sybase')
+        .from('DBA.ARTICULO')
+        .select(
+            Database.raw(
+              `top ${parametros.total} start at ${parametros.desde === 0 ? 1 : parametros.desde} [DBA].[ARTICULO].[cod_articulo] as codigo`
+            )
+          )
+        .select('DBA.ARTICULO.cod_articulo AS codigo')
+        .select('DBA.ARTICULO.des_art AS nombre')
+        .select('DBA.ARTICULO.cod_grupo')
+        .select('DBA.ARTICULO.cod_familia')
+        .select('DBA.FAMILIA.des_familia')
+        .select('DBA.ARTICULO.cod_original')
+        .select('DBA.ARTICULO.pr4_gs')
+        .select('DBA.ARTICULO.pr4_me')
+        .select('DBA.ARTICULO.CodMoneda')
+        .select(
+            Database.raw(
+              'DBA.f_get_ArticuloExistencia(DBA.ARTICULO.cod_empresa, DBA.ARTICULO.cod_articulo) as existencia'
+            )
+          )
+        .join('DBA.FAMILIA', 'DBA.ARTICULO.cod_familia', 'DBA.FAMILIA.cod_familia')
+        .where('DBA.ARTICULO.cod_empresa', 'PR')
+        .whereRaw('DBA.FAMILIA.COD_FAMILIA not in (?,?)', ['GA', '011'])
+        .limit(parametros.total)
+        .offset(parametros.desde)
+        // .limit(parametros.total)
+        // .offset(parametros.desde)
+        .orderBy('codigo')
+        .timeout(1000);*/
         
          
 
