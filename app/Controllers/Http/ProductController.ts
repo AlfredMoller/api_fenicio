@@ -109,13 +109,10 @@ export default class ProductController {
         
 
           // QUERY MODIFICADO EL 16/10 17:56  - ALFRED MöLLER 
-        const desde = parametros.desde === 0 ? 1 : parametros.desde; 
+        /*const desde = parametros.desde === 0 ? 1 : parametros.desde; 
         const productos = await Database
         .connection('sybase')
         .from('DBA.ARTICULO')
-        /*.select(
-          Database.raw(`TOP ${parametros.total} DBA.ARTICULO.cod_articulo AS codigo`)
-        )*/
         .select('DBA.ARTICULO.cod_articulo AS codigo')
         .select('DBA.ARTICULO.des_art AS nombre')
         .select('DBA.ARTICULO.cod_grupo')
@@ -146,7 +143,7 @@ export default class ProductController {
         .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
         .offset(desde - 1) // Ajustamos el "desde"
         .limit(parametros.total)
-        .timeout(1000);
+        .timeout(1000);*/
 
 
         // QUERY CREADO EL 17/10 10:14 - ALFRED MöLLER   
@@ -181,7 +178,55 @@ export default class ProductController {
         // .offset(parametros.desde)
         .orderBy('codigo')
         .timeout(1000);*/
-        
+
+        const desde = parametros.desde === 0 ? 1 : parametros.desde; 
+        const hasta = desde + parametros.total - 1;
+
+        const productos = await Database
+          .connection('sybase')
+          .from(Database.raw(`(
+            SELECT 
+              DBA.ARTICULO.cod_articulo AS codigo,
+              DBA.ARTICULO.des_art AS nombre,
+              DBA.ARTICULO.cod_grupo,
+              DBA.ARTICULO.cod_familia,
+              DBA.FAMILIA.des_familia,
+              DBA.ARTICULO.cod_original,
+              DBA.ARTICULO.pr4_gs,
+              DBA.ARTICULO.pr4_me,
+              DBA.ARTICULO.CodMoneda,
+              (SELECT SUM(existencia)
+              FROM DBA.ARTDEP ar
+              WHERE ar.cod_empresa = '${COD_EMPRESA}'
+                AND ar.cod_articulo = DBA.ARTICULO.cod_articulo
+                AND ar.existencia > 0) AS existencia,
+              ROW_NUMBER() OVER (ORDER BY DBA.ARTICULO.cod_articulo ASC) AS row_num
+            FROM DBA.ARTICULO
+            JOIN DBA.FAMILIA ON DBA.ARTICULO.cod_familia = DBA.FAMILIA.cod_familia
+            WHERE DBA.ARTICULO.cod_empresa = '${COD_EMPRESA}'
+              AND DBA.FAMILIA.COD_FAMILIA NOT IN ('GA', '011')
+              AND EXISTS (
+                SELECT 1 
+                FROM DBA.ARTDEP
+                WHERE DBA.ARTDEP.cod_articulo = DBA.ARTICULO.cod_articulo
+                  AND DBA.ARTDEP.existencia > 0
+              )
+          ) AS T`))
+          .select('T.codigo')
+          .select('T.nombre')
+          .select('T.cod_grupo')
+          .select('T.cod_familia')
+          .select('T.des_familia')
+          .select('T.cod_original')
+          .select('T.pr4_gs')
+          .select('T.pr4_me')
+          .select('T.CodMoneda')
+          .select('T.existencia')
+          .whereBetween('T.row_num', [desde, hasta])
+          .orderBy('T.codigo', 'asc')
+          .timeout(1000);
+
+                
          
 
         // Los campos precio_lista y precio_venta tendrían que llegar como "precioLista" y "precioVenta".
