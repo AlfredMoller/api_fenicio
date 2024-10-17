@@ -108,13 +108,14 @@ export default class ProductController {
           .timeout(1000)*/
         
           // QUERY MODIFICADO EL 16/10 17:56
+          const desde = parametros.desde === 0 ? 1 : parametros.desde; 
           const productos = await Database
           .connection('sybase')
           .from('DBA.ARTICULO')
-          .select(
+          /*.select(
             Database.raw(`TOP ${parametros.total} DBA.ARTICULO.cod_articulo AS codigo`)
-          )
-          //.select('DBA.ARTICULO.cod_articulo AS codigo')
+          )*/
+          .select('DBA.ARTICULO.cod_articulo AS codigo')
           .select('DBA.ARTICULO.des_art AS nombre')
           .select('DBA.ARTICULO.cod_grupo')
           .select('DBA.ARTICULO.cod_familia')
@@ -142,7 +143,8 @@ export default class ProductController {
           )
           
           .orderBy('DBA.ARTICULO.cod_articulo', 'asc')
-          //.limit(parametros.total)
+          .offset(desde - 1) // Ajustamos el "desde"
+          .limit(parametros.total)
           .timeout(1000);
 
         // QUERY CREADO EL 17/10 10>14  
