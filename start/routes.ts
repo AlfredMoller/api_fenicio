@@ -40,7 +40,7 @@ Route.group(() => {
 }).prefix('auth')
 
 Route.group(() => {
-  Route.post('productos', 'ProductController.productos')
+  Route.get('productos', 'ProductController.productos')
   Route.get('stockporsku', 'ProductController.productoSKUS')
   Route.post('orden', 'OrdersController.orden')
 }).middleware('auth:api')
