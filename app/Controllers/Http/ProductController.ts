@@ -40,20 +40,6 @@ export default class ProductController {
         }),
       })
 
-     // Validar que 'desde' y 'total' no sean 0
-    // Validar que 'total' no sea menor que 'desde' y que 'total' no sea 0
-    if (parametros.total <= 0 || parametros.total < parametros.desde) {      
-      return response.status(400).send({
-        status: 'ERROR',
-        mensaje: parametros.total <= 0 
-          ? "El valor de 'total' debe ser mayor que 0" 
-          : "El valor de 'total' no puede ser menor que 'desde'",
-        code: 400,
-        _idSolicitud: parametros._idSolicitud,
-        data: null,
-      });
-    }
-
       // Se arma estructura de query similar a stringbuilder 
 
       try {
